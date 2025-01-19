@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: ConfigServer
+  # In the below property we are passing the GitHub URI of the repos we created for handling Configuration Details.
+  # clone-on-start will make sure the repo is refresh on teh startup of application
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/sarthakhejib/microservice-configuration
+          clone-on-start: true
+
+
+server:
+  port: 8086
+
+# We are commenting below properties as, these will be picked from
+# the Config Server(GitHub(microservice-config))
+eureka:
+  instance:
+    prefer-ip-address: true
+    # The below property will registry this microservice with eureka server as a client
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8084/eureka

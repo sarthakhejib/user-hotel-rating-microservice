@@ -1,0 +1,74 @@
+spring:
+  # The below property will let this application fetch properties from Config Server.
+  # After adding the Config Client dependency we have made this service as a Config Client
+  config:
+    import: configserver:http://localhost:8086
+  datasource:
+    url: jdbc:mysql://localhost:3306/microservice
+    username: root
+    password: Sarthak@123
+  application:
+    name: UserService
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+
+server:
+  port: 8081
+
+#Below are Actuator configurations
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+  endpoint:
+    health:
+      show-details: always
+
+#CircuitBreaker, Retry and RateLimiter configuration below:
+resilience4j:
+  circuitbreaker:
+    instances:
+      ratingHotelCircuitBreaker:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 6s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+
+  retry:
+    instances:
+      ratingHotelCircuitBreaker:
+        max-attempts: 3
+        wait-duration: 5s
+
+  ratelimiter:
+    instances:
+      userRateLimiter:
+        limit-refresh-period: 4s
+        limit-for-period: 2
+        timeout-duration: 2s
+
+# We are commenting below properties as, these will be picked from
+# the Config Server(GitHub(microservice-config))
+
+#eureka:
+#  instance:
+#    prefer-ip-address: true
+#    # The below property will registry this microservice with eureka server as a client
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#    service-url:
+#      defaultZone: http://localhost:8084/eureka

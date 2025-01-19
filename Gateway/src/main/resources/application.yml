@@ -1,0 +1,41 @@
+spring:
+  # The below property will let this application fetch properties from Config Server.
+  # After adding the Config Client dependency we have made this service as a Config Client
+  config:
+    import: configserver:http://localhost:8086
+  application:
+    name: APIGateway
+  cloud:
+    gateway:
+      routes:
+        - id: USERSERVICE
+          uri: lb://USERSERVICE
+          predicates:
+            - Path=/users/**
+
+        - id: HOTELSERVICE
+          uri: lb://HOTELSERVICE
+          predicates:
+            - Path=/hotels/**
+
+        - id: RATINGSERVICE
+          uri: lb://RATINGSERVICE
+          predicates:
+            - Path=/rating/**
+
+
+server:
+  port: 8085
+
+# We are commenting below properties as, these will be picked from
+# the Config Server(GitHub(microservice-config))
+
+#eureka:
+#  instance:
+#    prefer-ip-address: true
+#    # The below property will registry this microservice with eureka server as a client
+#  client:
+#    register-with-eureka: true
+#    fetch-registry: true
+#    service-url:
+#      defaultZone: http://localhost:8084/eureka
